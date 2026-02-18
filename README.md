@@ -59,7 +59,7 @@ e.g. `Pain (4/5) - High. Client flags conflict of interest with current MSP.`
 ## Deployment
 
 1. Start PostgreSQL: `brew services start postgresql@15`
-2. Start n8n in Docker
+2. Start n8n in Docker Desktop
 3. Import workflow via n8n UI or API:
    ```bash
    curl -X PUT http://localhost:5678/api/v1/workflows/RlnZGOaKU4ee7D6M \
@@ -68,6 +68,37 @@ e.g. `Pain (4/5) - High. Client flags conflict of interest with current MSP.`
      -d @ECHOv4.json
    ```
 4. Activate the workflow in n8n UI
+
+---
+
+## Git Workflow — How to Push Changes to GitHub
+
+**Do NOT use n8n's built-in source control.** It requires Docker reconfiguration and a separate deploy key — it's fragile and unnecessary.
+
+Instead, use manual git push from the VS Code terminal. Run this from `/Users/austinhollsnd/Desktop/workflows/` after any change:
+
+```bash
+git add ECHOv4.json && git commit -m "describe what changed" && git push
+```
+
+### When to push:
+- After any prompt changes to the Assessment Engine or Artifact Engine
+- After any structural workflow changes (new nodes, connections, etc.)
+- After testing confirms the change is working
+
+### How workflow changes are made:
+1. Edit `ECHOv4.json` locally (via Claude or directly)
+2. Push to n8n via the API curl command above
+3. Push to GitHub via the git commands above
+
+### API key location:
+The n8n API key is stored in the n8n SQLite DB. Retrieve it with:
+```bash
+sqlite3 ~/.n8n/database.sqlite "SELECT apiKey, label FROM user_api_keys LIMIT 5;"
+```
+
+### SSH key:
+GitHub access uses the SSH key at `~/.ssh/github_echo`. This is already configured — `git push` works without any password.
 
 ---
 
