@@ -66,8 +66,10 @@ def receive():
     data = request.get_json(force=True)
     current_execution_id = data.get("execution_id")
     print(f"[portal] Received execution_id: {current_execution_id}")
+    # Open the real n8n form directly — JS-driven submission requires it
+    n8n_form_url = f"{N8N_BASE}/form-waiting/{current_execution_id}"
     threading.Thread(
-        target=open_browser, args=(f"http://localhost:{PORTAL_PORT}/review",), daemon=True
+        target=open_browser, args=(n8n_form_url,), daemon=True
     ).start()
     return {"status": "ok", "execution_id": current_execution_id}, 200
 
