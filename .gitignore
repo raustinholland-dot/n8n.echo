@@ -1,0 +1,6 @@
+# n8n local state
+**/.n8n-state.json
+*.backup-*
+
+# OS
+.DS_Store
