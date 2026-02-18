@@ -65,7 +65,7 @@ e.g. `Pain (4/5) - High. Client flags conflict of interest with current MSP.`
    curl -X PUT http://localhost:5678/api/v1/workflows/RlnZGOaKU4ee7D6M \
      -H "X-N8N-API-KEY: <key>" \
      -H "Content-Type: application/json" \
-     -d @local_5678_austin_h/personal/ECHOv4.json
+     -d @ECHOv4.json
    ```
 4. Activate the workflow in n8n UI
 
