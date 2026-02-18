@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "deal": "velentium-2026-02-18",
+    "call_date": "2026-01-21",
+    "description": "Austin's gold-standard outputs for the Velentium discovery call transcript. These are used by echo_eval.py to score prompt quality.",
+    "participants_clearwater": ["Austin Holland", "Richmond", "David K."],
+    "participants_client": ["Travis", "UK"]
+  },
+  "pain_evidence": "",
+  "power_evidence": "",
+  "vision_evidence": "",
+  "value_evidence": "",
+  "change_evidence": "",
+  "control_evidence": "",
+  "client_follow_up_email": "",
+  "salesforce_block_1_dap": "",
+  "internal_message_pricing": "",
+  "exec_recap_forwardable": ""
+}
