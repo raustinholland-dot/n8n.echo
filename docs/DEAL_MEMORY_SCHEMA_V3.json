@@ -1,0 +1,196 @@
+{
+  "_comment": "DEAL MEMORY SCHEMA V3 - Evidence-Based (Objective Assessment)",
+  "_version": "3.0.0",
+  "_updated": "2026-02-10",
+  "_philosophy": "Store FACTS and EVIDENCE, not subjective reasoning. P2V2C2 scores recalculated fresh each time based on objective rubric.",
+
+  "deal_slug": "paradigm-health-hipaa-assessment-2026-02-09",
+
+  "conversation_history": [
+    {
+      "turn_id": "turn_1_2026-02-09T10:00:00Z",
+      "timestamp": "2026-02-09T10:00:00Z",
+      "input_type": "email",
+      "input_source": "email_from_cmo_dr_chen.eml",
+
+      "user_input": {
+        "summary": "Email received from Dr. Sarah Chen (CMO)",
+        "raw_content": "From: Dr. Sarah Chen <sarah.chen@paradigmhealth.com>\nTo: Austin Hollis <austin@clearwater.com>\nDate: 2026-02-08\nSubject: RE: HIPAA Compliance Discussion\n\nAustin,\n\nThank you for reaching out. Our recent OCR audit revealed critical gaps in our security controls, and the board is demanding a comprehensive compliance roadmap before our Q2 meeting.\n\nWe have a 60-day remediation window, and I'm looking for immediate fractional CISO leadership to help us address these findings.\n\nCan we schedule a call next week to discuss your approach?\n\nBest regards,\nDr. Sarah Chen\nChief Medical Officer\nParadigm Health",
+        "metadata": {
+          "file_name": "email_from_cmo_dr_chen.eml",
+          "from": "sarah.chen@paradigmhealth.com",
+          "to": "austin@clearwater.com",
+          "subject": "RE: HIPAA Compliance Discussion",
+          "date": "2026-02-08"
+        }
+      },
+
+      "facts_documented": [
+        "Email received from Dr. Sarah Chen (CMO) on 2026-02-08",
+        "Dr. Chen stated: 'Recent OCR audit revealed critical gaps in our security controls'",
+        "Dr. Chen stated: 'Board is demanding comprehensive compliance roadmap before Q2 meeting'",
+        "Dr. Chen stated: '60-day remediation window'",
+        "Dr. Chen requested: 'Immediate fractional CISO leadership'",
+        "Dr. Chen requested: 'Schedule a call next week'",
+        "Stakeholder identified: Dr. Sarah Chen, title: Chief Medical Officer"
+      ],
+
+      "p2v2c2_assessment": {
+        "scores": {
+          "pain": 4,
+          "power": 3,
+          "vision": 2,
+          "value": 3,
+          "change": 3,
+          "control": 3,
+          "total": 18
+        },
+        "evidence_summary": [
+          "Pain=4: Executive Sponsor (CMO) explicitly admitted pain in email: 'OCR audit revealed critical gaps'",
+          "Power=3: Have identified PES (Dr. Chen, CMO), but have not yet met or confirmed DAP",
+          "Vision=2: Needs have been mapped (fractional CISO, compliance roadmap), but shared vision not created yet",
+          "Value=3: Solution fits their compliance needs (OCR remediation), but value not yet quantified",
+          "Change=3: PES has indicated need to change ('60-day remediation window', board pressure)",
+          "Control=3: Beginning to understand buying process (board involvement, Q2 deadline), vision being created"
+        ],
+        "momentum": "initial_assessment"
+      },
+
+      "cas_assessment": {
+        "current_stage": "1D: Discover - Champion shares their situation",
+        "verifiable_outcomes_completed": [
+          "1C: Shared Industry Trends (referenced in initial outreach)",
+          "1D: Champion (Dr. Chen) has shared their situation (OCR audit, board pressure, 60-day timeline)"
+        ],
+        "next_verifiable_outcome": "1VO: Potential Champion Willing to Change - Need to confirm Dr. Chen is willing to champion our solution internally",
+        "pending_requirements": [
+          "Confirm Dr. Chen's willingness to advocate for Clearwater",
+          "Schedule initial discovery call to validate pain and understand power structure"
+        ]
+      },
+
+      "actions_taken": [
+        "Sent calendar invite for discovery call (week of 2/10)",
+        "Prepared initial discovery questions focused on OCR findings and board requirements"
+      ]
+    },
+
+    {
+      "turn_id": "turn_2_2026-02-09T16:00:00Z",
+      "timestamp": "2026-02-09T16:00:00Z",
+      "input_type": "email",
+      "input_source": "email_from_cfo_jennifer_lopez.eml",
+
+      "user_input": {
+        "summary": "Email received from CFO Jennifer Lopez after intro by Dr. Chen",
+        "raw_content": "From: Jennifer Lopez <jennifer.lopez@paradigmhealth.com>\nTo: Austin Hollis <austin@clearwater.com>\nCc: Dr. Sarah Chen <sarah.chen@paradigmhealth.com>\nDate: 2026-02-09\nSubject: RE: Budget Discussion - HIPAA Assessment\n\nAustin,\n\nSarah asked me to connect with you regarding the HIPAA assessment proposal.\n\nI understand the compliance urgency, but I need to understand the ROI. Budget is tight this quarter, and I need to justify the investment to our CEO.\n\nThat said, our counsel has warned us that OCR penalties could reach $2.3M if we don't address these findings. If your assessment can help us avoid that exposure, it's worth discussing.\n\nCan you send over a preliminary scope and pricing structure?\n\nBest regards,\nJennifer Lopez\nChief Financial Officer",
+        "metadata": {
+          "file_name": "email_from_cfo_jennifer_lopez.eml",
+          "from": "jennifer.lopez@paradigmhealth.com",
+          "to": "austin@clearwater.com",
+          "cc": "sarah.chen@paradigmhealth.com",
+          "subject": "RE: Budget Discussion - HIPAA Assessment",
+          "date": "2026-02-09"
+        }
+      },
+
+      "facts_documented": [
+        "Email received from Jennifer Lopez (CFO) on 2026-02-09",
+        "CFO introduced by Dr. Chen (CMO) - cc'd on email",
+        "CFO stated: 'Sarah asked me to connect with you regarding the HIPAA assessment proposal'",
+        "CFO stated: 'Budget is tight this quarter, need to justify investment to CEO'",
+        "CFO stated: 'Counsel warned us OCR penalties could reach $2.3M'",
+        "CFO stated: 'If your assessment can help us avoid that exposure, it's worth discussing'",
+        "CFO requested: 'Preliminary scope and pricing structure'",
+        "Stakeholder identified: Jennifer Lopez, title: Chief Financial Officer, role: Economic Buyer",
+        "Decision hierarchy clarified: CFO reports to CEO for budget approval"
+      ],
+
+      "p2v2c2_assessment": {
+        "scores": {
+          "pain": 4,
+          "power": 4,
+          "vision": 3,
+          "value": 4,
+          "change": 3,
+          "control": 4,
+          "total": 22
+        },
+        "evidence_summary": [
+          "Pain=4: UNCHANGED - PES (Dr. Chen) has admitted pain (from Turn 1)",
+          "Power=4: INCREASED from 3 - PES (Dr. Chen) has introduced CFO (Economic Buyer), showing DAP development in progress. Per rubric: 'PES has agreed to DAP' partially demonstrated by CFO engagement",
+          "Vision=3: INCREASED from 2 - CFO and CMO are aligning on approach. Needs mapped (HIPAA assessment), and beginning to agree on solution criteria. Per rubric: moving toward 'agreed to proof criteria'",
+          "Value=4: INCREASED from 3 - CFO explicitly acknowledged $2.3M penalty avoidance. Per rubric: 'ES has shared benefits of solution with DM' - CFO (Economic Buyer) now aware of value proposition",
+          "Change=3: UNCHANGED - PES agrees on need to change (Turn 1 evidence), but not yet reached 'ES has chosen Clearwater to lead change'",
+          "Control=4: INCREASED from 3 - Beginning to map buying process: CFO involvement, CEO approval needed, counsel advising. Per rubric: moving toward 'ES has agreed to DAP'"
+        ],
+        "momentum": "improving (18→22, +4 points due to CFO engagement and value acknowledgment)"
+      },
+
+      "cas_assessment": {
+        "current_stage": "2A: Qualify - Validate Current State & Pain with Champion",
+        "verifiable_outcomes_completed": [
+          "1VO: Potential Champion Willing to Change - Dr. Chen introduced CFO, showing willingness to champion internally",
+          "2A: Beginning validation of pain (OCR audit findings) and compelling reason to change (board deadline, $2.3M penalty exposure)"
+        ],
+        "next_verifiable_outcome": "2VO: PES Bought into Dual Action Plan (DAP) - Need formal agreement on process to get to proposal",
+        "pending_requirements": [
+          "Schedule discovery call with Dr. Chen + CFO to validate pain and create vision",
+          "Develop Dual Action Plan with clear milestones and timeline",
+          "Gain access to CEO if budget approval required"
+        ]
+      },
+
+      "actions_taken": [
+        "Sent preliminary scope and pricing structure to CFO (2/9/2026)",
+        "Drafted ROI justification document showing $2.3M penalty avoidance vs. $145K investment",
+        "Requested meeting with Dr. Chen + CFO + CEO (if available) for week of 2/17"
+      ]
+    }
+  ],
+
+  "salesforce_data": {
+    "_comment": "27 auto-sync fields from Salesforce",
+    "Account Name": "Paradigm Health",
+    "Opportunity Name": "HIPAA Security Assessment + vCISO Retainer",
+    "Stage": "Qualify",
+    "Critical Activity Stage": "2A: Validate Pain with Champion",
+    "Close Date": "3/15/2026",
+    "Amount": "145000.00",
+    "Pain": "4",
+    "Power": "4",
+    "Vision": "3",
+    "Value": "4",
+    "Change": "3",
+    "Control": "4",
+    "P2V2C2 Total": "22",
+    "Pain Description": "CMO stated: OCR audit revealed critical gaps. Board demanding compliance roadmap. $2.3M penalty exposure.",
+    "Persons w/Power": "Dr. Sarah Chen (CMO, PES), Jennifer Lopez (CFO, Economic Buyer), CEO (name unknown, final approval)",
+    "Deal Highlights": "60-day remediation window. Board meeting Q2. CFO engaged and acknowledges ROI ($2.3M penalty avoidance).",
+    "Risks": "Budget tight this quarter. CEO approval required. Timeline aggressive (60 days).",
+    "Next Step": "2/17 - Discovery call with CMO + CFO to validate pain, create vision, and develop DAP"
+  },
+
+  "outputs": [],
+
+  "static_fields": {
+    "deal_slug": "paradigm-health-hipaa-assessment-2026-02-09",
+    "created_date": "2/8/2026",
+    "account_name": "Paradigm Health",
+    "opportunity_name": "HIPAA Security Assessment + vCISO Retainer",
+    "owner": "Austin Hollis"
+  },
+
+  "metadata": {
+    "version": "3.0.0",
+    "schema_type": "evidence_based",
+    "last_updated": "2026-02-09T16:30:00Z",
+    "conversation_turn_count": 2,
+    "latest_p2v2c2_total": 22,
+    "p2v2c2_trajectory": [
+      {"turn": 1, "total": 18, "timestamp": "2026-02-09T10:00:00Z"},
+      {"turn": 2, "total": 22, "timestamp": "2026-02-09T16:00:00Z"}
+    ],
+    "p2v2c2_momentum": "improving"
+  }
+}
