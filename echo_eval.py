@@ -17,7 +17,14 @@ import argparse
 import google.generativeai as genai
 
 # ── Config ───────────────────────────────────────────────────────────────────
-GEMINI_API_KEY   = "AIzaSyBdCH67ed-TLBQZHLMRKUCh9K0tTsdfAZ0"
+import os, pathlib
+_env = pathlib.Path("/Users/austinhollsnd/Desktop/workflows/.env")
+if _env.exists():
+    for _line in _env.read_text().splitlines():
+        if "=" in _line and not _line.startswith("#"):
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
+GEMINI_API_KEY   = os.environ["GEMINI_API_KEY"]
 ASSESSMENT_MODEL = "gemini-2.0-flash"
 ARTIFACT_MODEL   = "gemini-2.0-flash-lite"
 JUDGE_MODEL      = "gemini-2.0-flash"
