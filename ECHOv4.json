@@ -89,59 +89,8 @@
       "parameters": {
         "promptType": "define",
         "text": "={{ $json.content }}",
-        "hasOutputParser": true,
         "options": {
-          "systemMessage": "You are an expert sales analyst using the P2V2C2 methodology to assess deal health.\n\nYour task: Analyze the provided information and score the deal across 6 critical dimensions.\n\nSCORING RULES - CRITICAL:\n- Each dimension (pain, power, vision, value, change, control) is scored 0-5 (integers only, max 5)\n- Total p2v2c2 score = sum of all 6 dimensions (max 30)\n- NEVER score above 5 on any individual dimension\n- cas_current and cas_next MUST use the format \"[1-5][A-B]: [short description]\" e.g. \"2A: Qualify - Initial engagement\" or \"3B: Prove - Validation complete\"\n- cas_confidence must be lowercase: \"low\", \"medium\", or \"high\"\n\nFor NEW DEALS (when content is empty or minimal):\n- Score all dimensions 0-2 as appropriate given limited information\n- cas_current: \"1A: Discover - Initial conversation\"\n- cas_next: \"1B: Discover - Problem validation\"\n\nFor EXISTING DEALS (with content):\n- Analyze the content thoroughly\n- Provide evidence-based scoring\n- Reference specific details from the conversation/notes\n\nOutput Format: JSON with p2v2c2_scores object containing pain, power, vision, value, change, control (each with score 0-5 and evidence)."
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
-      "position": [
-        112,
-        80
-      ],
-      "name": "Assessment Engine (Agent 1)",
-      "alwaysOutputData": true
-    },
-    {
-      "parameters": {
-        "options": {
-          "temperature": 0
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
-      "position": [
-        128,
-        304
-      ],
-      "name": "Gemini 2.0 Flash (Assessment)",
-      "alwaysOutputData": false,
-      "credentials": {
-        "googlePalmApi": {
-          "id": "uGJhc7GKkYJUOGwm",
-          "name": "Google Gemini API"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsonSchemaExample": "={\n  \"deal_slug\": \"partnership-healthplan\",\n  \"input_type\": \"call_transcript\",\n  \"date\": \"2025-01-15\",\n  \"participants\": [\"Austin Holland\", \"Client Contact\"],\n  \"state\": {\n    \"opportunity_name\": \"Partnership HealthPlan - Add-on\",\n    \"account_name\": \"Partnership HealthPlan\",\n    \"cas_current\": \"2B: Qualify - Set expectations\",\n    \"cas_next\": \"3A: Prove - Co-create approach\",\n    \"cas_confidence\": \"high\",\n    \"p2v2c2\": {\n      \"pain\": 3,\n      \"power\": 3,\n      \"vision\": 2,\n      \"value\": 2,\n      \"change\": 3,\n      \"control\": 2,\n      \"total\": 15\n    },\n    \"tcv_model\": {\n      \"base_tcv\": 50000,\n      \"expansion_tcv\": 25000,\n      \"renewal_tcv\": 0\n    }\n  },\n  \"diagnostics\": {\n    \"deal_health\": {\n      \"top_3_strengths\": [\"Strong executive sponsor identified\", \"Clear pain with urgency\", \"Budget allocated\"],\n      \"top_3_risks\": [\"No technical validation yet\", \"Competing priorities\", \"Timeline compressed\"],\n      \"unknowns_blocking_progress\": [\"Final decision maker not confirmed\", \"Legal review timeline\"]\n    },\n    \"delta_summary\": \"Progressed from discovery to qualification. Executive sponsor engaged and budget confirmed.\"\n  },\n  \"evidence\": {\n    \"pain\": \"Client stated: 'We failed our SOC 2 audit and need to remediate before Q2 renewal'\",\n    \"power\": \"Met with VP of IT (budget holder) and CISO (executive sponsor)\",\n    \"vision\": \"Client wants to achieve SOC 2 compliance and improve security posture\",\n    \"value\": \"Estimated $200K in avoided audit costs and faster compliance timeline\",\n    \"change\": \"Client committed to starting project in Q1 with dedicated resources\",\n    \"control\": \"Next steps agreed: technical validation call scheduled for next week\"\n  },\n  \"highlights\": [\n    \"Executive sponsor highly engaged and championing internally\",\n    \"Clear business case with quantified ROI\",\n    \"Competitive displacement opportunity identified\"\n  ]\n}"
-      },
-      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
-      "typeVersion": 1.3,
-      "position": [
-        256,
-        304
-      ],
-      "name": "Structured Output Parser (Assessment)"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "={{ JSON.stringify($json) }}",
-        "options": {
-          "systemMessage": "=You are the Artifact Engine for Deal Path V2.\n\nYour task is to generate ALL required outputs to progress the deal from current CAS to 5VO.\n\n# ASSESSMENT CONTEXT\n\n{{ JSON.stringify($('Assessment Engine (Agent 1)').item.json, null, 2) }}\n\n# CAS-TO-ARTIFACT MAPPING\n\nGenerate artifacts based on current CAS:\n\n**CAS 1A/1B (Discovery):**\n- Call summary\n- Internal message\n\n**CAS 2A/2B (Qualify):**\n- Call summary\n- Salesforce DAP block\n- Salesforce P2V2C2 block\n- Client follow-up email\n- Internal scoping message\n\n**CAS 3A/3B (Prove):**\n- All CAS 2 artifacts +\n- Approach document prep\n- Validation meeting prep\n\n**CAS 4A/4B (Negotiate):**\n- MSA/SOW review\n- Redline analysis\n\n**CAS 5A/5B (Close):**\n- Contract review\n- Kickoff prep\n\n# OUTPUT FORMATTING RULES\n\n## Client Follow-Up Email\n- Address client participants only (not Clearwater participants) \u2014 first names, no \"Hi\" opener needed, just \"[FirstName] and [FirstName],\"\n- 4-6 paragraphs, 150-200 words\n- Structure: Context acknowledgment (specific detail from call, not generic appreciation) \u2192 What we heard/what matters \u2192 \"As discussed, our next steps are as follows:\" \u2192 Bulleted next steps with specifics (actual numbers, dates if known) \u2192 Brief closing\n- Tone: Consultative, direct, warm \u2014 NOT corporate/formal. No filler phrases like \"I appreciate you taking the time\" or \"Thank you for the opportunity\"\n- Include specific details from the transcript: actual counts, technology names, timeline anchors\n- Closing: \"We look forward to speaking with you again.\\n\\nBest,\\nAustin\"\n- NO random bolding\n- Do NOT include a subject line in the field value\n\n## Salesforce DAP Block\n- Timeline: The call/input date is available in the assessment context as `date`. Use it as your anchor for all COMPLETED milestones. DO NOT use any date before that date for completed items. DO NOT invent dates like 2024-05-15 or use placeholder years like 2024 \u2014 the current year is 2026.\n- Timeline format: \"YYYY-MM-DD - [Milestone] [STATUS]\"\n- Statuses: [COMPLETED], [IN PROGRESS]>>, [PENDING], or [PLANNED] \u2014 use [status] as placeholder ONLY when you truly cannot infer the date\n- Build the FULL deal path from current stage to close: include Scoping/Pricing, Approach Presentation, Co-Create, Go/No-Go, Budget Approval, MSA/SOW, Redlines, DocuSign, Contract Execution, Kickoff\n- Project future dates forward from the anchor date based on realistic deal timelines (1-2 weeks per stage)\n- Current State: ORGANIZATION / ACTIVITIES / TECHNOLOGY (be specific about what the client uses today)\n- Future State: ORGANIZATION / ACTIVITIES / TECHNOLOGY (what Clearwater owns vs. what stays with client/MSP)\n- Risks: specific, concise (max 200 chars)\n- Next Step: single concrete action (max 100 chars)\n\n## Salesforce P2V2C2 Descriptions\n- Each field uses the format: \"[Dimension] ([score]/5) - [Intensity label]. [One-sentence summary of evidence].\"\n- Intensity labels: 0=None, 1=Minimal, 2=Low, 3=Medium, 4=High, 5=Very Strong\n- Examples:\n  - \"Pain (4/5) - High. Client explicitly flags a conflict of interest with their current MSP as the 'fox guarding the hen house.'\"\n  - \"Vision (5/5) - Very Strong. Client has a documented delineation of responsibilities and knows exactly what they want Clearwater to own.\"\n- Keep the summary tight (1-2 sentences max). Use the client's own language/quotes when possible.\n\n## Executive Recap (exec_recap_forwardable)\n- Include all named Clearwater participants AND client participants (e.g., \"Austin, Richmond, and David K. engaged with Travis and UK at Velentium\")\n- Use the client's own language and quotes to capture key insights \u2014 do not sanitize into generic language\n- Cover: why we engaged, what the client's current situation is (specific), what they want Clearwater to own, key nuances/distinctions from the conversation, next steps\n- 2-4 paragraphs, forwardable to an internal executive without needing to read the full transcript\n- Do NOT use bullet points in this field \u2014 narrative prose only\n\n## Internal Message\n- Identify the correct recipient by name from context (e.g., pricing = Steve, SME = relevant engineer)\n- If recipient name is unknown, use their role: \"Hey [Pricing Lead]\"\n- Format: \"Hey [Name], had a [call type] with [Client]. [2-3 sentence context including scope model and why this matters]. [Bulleted list of specific technical counts/specs if applicable]. [Specific ask].\"\n- Must include: service model distinction (what Clearwater owns vs. what stays with client/MSP), all enumerated device/user counts from transcript, any named technologies (e.g., Sentinel, Defender, Entra ID, Fortigate)\n- Do NOT use vague asks like \"provide pricing\" \u2014 be specific about what to calculate\n\n# OUTPUT STRUCTURE\n\nReturn JSON:\n\n{\n  \"artifacts\": {\n    \"salesforce_block_1_dap\": \"Full DAP timeline + current/future state + risks + next step\",\n    \"salesforce_pain_description\": \"Pain evidence from assessment\",\n    \"salesforce_power_description\": \"Power evidence\",\n    \"salesforce_vision_description\": \"Vision evidence\",\n    \"salesforce_value_description\": \"Value evidence\",\n    \"salesforce_change_description\": \"Change evidence\",\n    \"salesforce_control_description\": \"Control evidence\",\n    \"client_follow_up_email\": \"Full email body (no subject)\",\n    \"exec_recap_forwardable\": \"Executive summary\",\n    \"internal_message_pricing\": \"Internal team message\",\n    \"meeting_prep\": \"Next meeting prep materials\",\n    \"assumptions\": \"Key assumptions made\",\n    \"exclusions\": \"What's explicitly out of scope\"\n  },\n  \"plan\": {\n    \"action_plan\": [\n      {\"date\": \"YYYY-MM-DD\", \"owner\": \"Name\", \"action\": \"Description\", \"status\": \"pending|in_progress|done\"}\n    ],\n    \"internal_asks\": [\n      \"Ask 1 (who needs to do what)\",\n      \"Ask 2\"\n    ],\n    \"win_plays\": [\n      \"Play 1: Strategy to advance deal\",\n      \"Play 2\"\n    ]\n  },\n  \"orchestration\": {\n    \"artifacts_generated\": [\"list of artifact keys created\"],\n    \"artifacts_skipped\": [\"list of artifacts not needed for this CAS\"]\n  }\n}\n\nReturn ONLY the JSON object, no additional text."
+          "systemMessage": "INSTRUCTIONS\nYou are an expert Sales Assistant for Austin Holland, a Sales Executive at Clearwater Security & Compliance on the Physician Practice Management (PPM) team. You are a consummate professional, experience sales strategist who is able to hold the full context of a specific deal. With this deep experience and understanding, your ultimate job is to initially asses and then continually recalculate the telling artifacts of the deal at any point, giving you the ability to recall the current full understanding of the deal at any given time.\n\n**Make sure to keep information for each deal separate, so you don't get confused by analyzing information that belongs to a different deal.\n**IF it's the first time you're receiving information about a deal, create all possible artifacts for both artifact categories (Salesforce Data and Narrative Data).\n**IF it's not the first time, only edit the artifacts that have changed since last time.\n**Lastly, make sure to read and understand the knowledge documents so you can apply Clearwater's sales methodology, terminology, market position, and unique offerings to your analysis.\n\nKNOWLEDGE DOCUMENT UTILIZATION\n\nCPS Methodology: Refer to the \"2024 CPS Refresher\" for relevant salesforce and other artifact requirements.\n\nService Catalog: Refer to the \"Clearwater Company and Services Overview\" to ensure technical services (e.g., MSS, IRM|Analysis, Sentinel/Defender management) are described using correct terminology.\n\n\nKEY ASSUMPTIONS\nYour goal is to process input data into distinct artifacts:\n**Anchor Date:** Assume the date the data is submitted on the day of the discovery call unless explicitly stated otherwise.*\n**Projections:** If DAP dates are not explicitly agreed upon in the discovery call data, project logical future dates based on a standard successful sales cadence (e.g., Co-Create 1 week after discovery) starting from the Anchor Date. Do not leave dates blank.*\n\n\n### PHASE 1: SALESFORCE DATA (Copy-Paste Blocks)\n**Salesforce Data** (Formatted for easy copy-paste)\n\nClose Date: [Date] (- Execute contract [STATUS])\n\nStage: [Created]/[Discover]/[Qualify]/[Prove]/[Close]\n\nCritical Activity Stage: e.g., [3A: Determine Proof Criteria, Co Create]\n\nForecast Category: [Omitted]/[Pipeline]/[Upside]/[Commit]/[Negotiate]/[Closed]\n\n**Block 1: DAP & Deal Highlights**\n\nDAP Status: [Confirmed by client OR Internal Draft]\n\nTimeline:\n\n[Date] - Initial Discovery [STATUS]\n[Date] - Define Current State and Desired Future State [STATUS]\n[Date] - Co-Create Session [STATUS]\n[Date] - Present Draft Approach [STATUS]\n[Date] - Present updated Approach based on feedback [STATUS]\n[Date] - Go / No Go Decision [STATUS]\n[Date] - Submit for Budget Approval [STATUS]\n[Date] - Send MSA/SOW [STATUS]\n[Date] - [Client Name] Initial Review of MSA / SOW & redlines [STATUS]\n[Date] - Call to Review Redlines [STATUS]\n[Date] - Finalize Redlines and launch DocuSign [STATUS]\n[Date] - Execute contract [STATUS]\n[Date] - Initial Engagement Meeting/ Project Start [STATUS]\n[Date] - Final report delivered to [Client name] [STATUS]\n\nCurrent State:\nORGANIZATION: [Insert text]\nACTIVITIES: [Insert text]\nTECHNOLOGY: [Insert text]\n\nFuture & Desired State:\nORGANIZATION: [Insert text]\nACTIVITIES: [Insert text]\nTECHNOLOGY: [Insert text]\n\nKey Stakeholder Success Criteria:\nTO THE BOARD: [Insert text]\n[STAKEHOLDER NAME/ROLE]: [Insert text]\n\nRisks: [Insert text]\n\nNext Step: [Insert text]\n\nBlock 2: P2V2C2 Scoring\n\nPain (0-5): [Score] - [Description of Pain articulated by Champion/ES]\nPower (0-5): [Score] - [Identify the ES/Person with Power]\nVision (0-5): [Score] - [Description of ES's Vision]\nValue (0-5): [Score] - [Notes on value/benefits delivery]\nChange (0-5): [Score] - [Status of acknowledgement of necessity to change]\nControl (0-5): [Score] - [Progress toward Control]\n\n\nPHASE 2: NARRATIVE ARTIFACTS\n\n1) Summary of the call, or email, or discussion, or message\n\n2) Highlights of what was discussed\n\n3) Next Steps - either explicitly mentioned or likely expectations of the prospect\n\n4) (\"Deal Highlights\", DAP\", \"Current State, Future & Key Stakeholder Success Criteria\", \"Risks\", and \"Next Step\".)\n\n5) (P2V2C2 Scoring)\n\n6) Internal action items - predicted needed outputs to perpetuate deal cycle as quickly as possible\n\n7) Products/Services Narrative (mentioned or established) - include a list of all specific services, workstreams/ engagements/ products, mentioned or established throughout the deal cycle. Include all relevant information pertaining to scope, timing, quantities, unknowns. Any named colleagues in relation to solutions mentioned. Include notes on prospects sentiments towards proposed solutions or any nuances or patterns in their behavior that could improve deal path outcome.\n\n8) A general narrative of all inputs including all correspondence both with prospect and internally, with ending conclusion on how to best close the highest possible TCV while considering the full context of the deal.\n\n9) Any other anecdotes or artifacts from input data that could aid future insights, or functionality of the model\n\n10) INTERNAL TEAM UPDATE **Tone: Astute, eloquent, and professional.**\n\nDraft a thorough update based on the required structure below.\n\nBe highly specific and eloquent.\n\nTreat the deal mechanics with serious, almost exaggerated reverence.\n\nUse subtle, dry sarcasm regarding corporate behaviors or delays.\n\nStructure:\n\nOpportunity Source: (Where did this come from?)\n\nDAP Review: (Brief status check)\n\nCurrent/Future State Narrative: (Important: Do not use bullets here. Be thoughtful and consider the full context of the opportunity history. Weave the facts into a \"story\" or narrative about the client's plight and their likely path to creating a desired future state.)\n\nP2V2C2 Strengths & Weaknesses: (Where are we strong, where are we exposed?)\n\nWinning Strategy: (How we close this)\n\nLeadership Help: (Ask for specific help if needed; otherwise, state that the situation is \"under control\").\n\n\nOUTPUT FORMAT\nUse the clearwater_knowledge_base tool to look up the P2V2C2 scoring rubric, CPS stage definitions, and Clearwater service terminology before scoring.\nReturn ONLY the following JSON object - no preamble, no markdown fences:\n{\n  \"salesforce\": {\n    \"close_date\": \"\",\n    \"stage\": \"\",\n    \"cas\": \"\",\n    \"forecast_category\": \"\",\n    \"salesforce_block_1_dap\": \"\",\n    \"risks\": \"\",\n    \"next_step\": \"\",\n    \"pain_score\": 0,\n    \"pain_evidence\": \"\",\n    \"power_score\": 0,\n    \"power_evidence\": \"\",\n    \"vision_score\": 0,\n    \"vision_evidence\": \"\",\n    \"value_score\": 0,\n    \"value_evidence\": \"\",\n    \"change_score\": 0,\n    \"change_evidence\": \"\",\n    \"control_score\": 0,\n    \"control_evidence\": \"\"\n  },\n  \"narratives\": {\n    \"call_summary\": \"\",\n    \"highlights\": \"\",\n    \"action_items\": \"\",\n    \"p2v2c2_scoring\": \"\",\n    \"internal_actions\": \"\",\n    \"services_narrative\": \"\",\n    \"general_narrative\": \"\",\n    \"anecdotes\": \"\",\n    \"internal_team_update\": \"\"\n  }\n}"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -150,30 +99,9 @@
         384,
         64
       ],
-      "name": "Artifact Engine (Agent 2)",
+      "name": "ECHO Engine",
       "alwaysOutputData": true,
       "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "modelName": "models/gemini-2.0-flash-lite",
-        "options": {
-          "temperature": 0.3
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
-      "position": [
-        400,
-        288
-      ],
-      "name": "Gemini 2.0 Flash (Artifact)",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "uGJhc7GKkYJUOGwm",
-          "name": "Google Gemini API"
-        }
-      }
     },
     {
       "parameters": {
@@ -185,11 +113,11 @@
         528,
         288
       ],
-      "name": "Structured Output Parser (Artifact)"
+      "name": "Structured Output Parser"
     },
     {
       "parameters": {
-        "jsCode": "// Merge Assessment + Artifacts for PostgreSQL\nconst assessment = $('Assessment Engine (Agent 1)').item.json;\nconst artifacts = $('Artifact Engine (Agent 2)').item.json;\nconst input = $('Input Classifier').item.json;\nconst dealContext = $('Merge Deal Context').item.json;\n\nif (!assessment || !artifacts || !input) {\n  throw new Error('Missing required data from previous nodes');\n}\n\n// SQL escape helpers - safely quote strings and handle nulls\nfunction esc(val) {\n  if (val === null || val === undefined || val === '') return 'NULL';\n  return \"'\" + String(val).replace(/'/g, \"''\") + \"'\";\n}\nfunction escStr(val) {\n  // Like esc but empty string becomes empty string quoted, not NULL\n  if (val === null || val === undefined) return 'NULL';\n  return \"'\" + String(val).replace(/'/g, \"''\") + \"'\";\n}\nfunction escNum(val) {\n  const n = Number(val);\n  return isNaN(n) ? '0' : String(n);\n}\nfunction escBool(val) {\n  return val ? 'true' : 'false';\n}\n\n// Unwrap output wrapper (n8n agents return { output: { ... } })\n// Also handle case where output is a raw JSON string (parse it)\nfunction unwrap(node) {\n  const raw = node.output !== undefined ? node.output : node;\n  if (typeof raw === 'string') {\n    try {\n      const cleaned = raw.replace(/^```json\\s*/i, '').replace(/^```\\s*/i, '').replace(/```\\s*$/i, '').trim();\n      return JSON.parse(cleaned);\n    } catch(e) { return {}; }\n  }\n  return raw;\n}\nconst assessmentData = unwrap(assessment);\nconst artifactsData = unwrap(artifacts);\n\n// Extract 2-char stage code from CAS (DB column is varchar(2))\nfunction extractStageCode(casStr) {\n  if (!casStr) return '1A';\n  // Try pattern like \"2B: ...\" or \"2B ...\" first\n  const match = casStr.match(/^([1-5][AB])/i);\n  if (match) return match[1].toUpperCase();\n  // Fallback keyword mapping for free-text CAS names from AI\n  const s = casStr.toLowerCase();\n  if (s.includes('close') || s.includes('won') || s.includes('lost')) return '5A';\n  if (s.includes('negot') || s.includes('contract') || s.includes('msa') || s.includes('sow')) return '4A';\n  if (s.includes('prov') || s.includes('valid') || s.includes('proposal') || s.includes('demo')) return '3A';\n  if (s.includes('qualif') || s.includes('engaged') || s.includes('discover')) return '2A';\n  return '1A';\n}\nconst stage = extractStageCode(assessmentData.state?.cas_current);\n\n// Raw values\nconst deal_slug = input.deal_slug || '';\nconst salesforce_opportunity_id = assessmentData.salesforce_opportunity_id || dealContext?.salesforce_opportunity_id || input.salesforce_opportunity_id || null;\nconst opportunity_name = assessmentData.state?.opportunity_name || '';\nconst account_name = assessmentData.state?.account_name || '';\nconst cas_current = assessmentData.state?.cas_current || '';\nconst cas_next = assessmentData.state?.cas_next || '';\nconst cas_confidence = (assessmentData.state?.cas_confidence || 'low').toLowerCase();\nconst close_date = assessmentData.state?.close_date || null;\n\nconst pain_score = assessmentData.state?.p2v2c2?.pain || 0;\nconst power_score = assessmentData.state?.p2v2c2?.power || 0;\nconst vision_score = assessmentData.state?.p2v2c2?.vision || 0;\nconst value_score = assessmentData.state?.p2v2c2?.value || 0;\nconst change_score = assessmentData.state?.p2v2c2?.change || 0;\nconst control_score = assessmentData.state?.p2v2c2?.control || 0;\nconst p2v2c2_total = assessmentData.state?.p2v2c2?.total || 0;\n\nconst pain_evidence = artifactsData.artifacts?.salesforce_pain_description || assessmentData.evidence?.pain || '';\nconst power_evidence = artifactsData.artifacts?.salesforce_power_description || assessmentData.evidence?.power || '';\nconst vision_evidence = artifactsData.artifacts?.salesforce_vision_description || assessmentData.evidence?.vision || '';\nconst value_evidence = artifactsData.artifacts?.salesforce_value_description || assessmentData.evidence?.value || '';\nconst change_evidence = artifactsData.artifacts?.salesforce_change_description || assessmentData.evidence?.change || '';\nconst control_evidence = artifactsData.artifacts?.salesforce_control_description || assessmentData.evidence?.control || '';\n\nconst salesforce_block_1_dap = artifactsData.artifacts?.salesforce_block_1_dap || '';\nconst client_follow_up_email = artifactsData.artifacts?.client_follow_up_email || '';\nconst exec_recap_forwardable = artifactsData.artifacts?.exec_recap_forwardable || '';\nconst internal_message_pricing = artifactsData.artifacts?.internal_message_pricing || '';\nconst meeting_prep = artifactsData.artifacts?.meeting_prep || '';\nconst assumptions = artifactsData.artifacts?.assumptions || '';\nconst exclusions = artifactsData.artifacts?.exclusions || '';\n\nconst event_type = input.input_type || '';\nconst event_source = input.source || '';\nconst event_date = input.date || new Date().toISOString().split('T')[0];\nconst summary = `Processed ${input.input_type} - CAS: ${cas_current || 'N/A'}`;\nconst link_or_ref = input.source_filename || '';\nconst raw_content = (input.content || '').substring(0, 5000);\n\n// Build pre-escaped SQL strings\nconst insertDealSQL = `INSERT INTO deals (\n  deal_slug,\n  salesforce_opportunity_id,\n  outputs_version,\n  opportunity_name,\n  account_name,\n  stage,\n  cas_current,\n  cas_next,\n  cas_confidence,\n  pain_score,\n  power_score,\n  vision_score,\n  value_score,\n  change_score,\n  control_score\n) VALUES (\n  ${esc(deal_slug)},\n  ${esc(salesforce_opportunity_id)},\n  'v2',\n  ${escStr(opportunity_name)},\n  ${escStr(account_name)},\n  ${escStr(stage)},\n  ${escStr(cas_current)},\n  ${escStr(cas_next)},\n  ${escStr(cas_confidence)},\n  ${escNum(pain_score)},\n  ${escNum(power_score)},\n  ${escNum(vision_score)},\n  ${escNum(value_score)},\n  ${escNum(change_score)},\n  ${escNum(control_score)}\n)\nON CONFLICT (deal_slug) DO UPDATE SET\n  salesforce_opportunity_id = EXCLUDED.salesforce_opportunity_id,\n  outputs_version = EXCLUDED.outputs_version,\n  opportunity_name = EXCLUDED.opportunity_name,\n  account_name = EXCLUDED.account_name,\n  stage = EXCLUDED.stage,\n  cas_current = EXCLUDED.cas_current,\n  cas_next = EXCLUDED.cas_next,\n  cas_confidence = EXCLUDED.cas_confidence,\n  pain_score = EXCLUDED.pain_score,\n  power_score = EXCLUDED.power_score,\n  vision_score = EXCLUDED.vision_score,\n  value_score = EXCLUDED.value_score,\n  change_score = EXCLUDED.change_score,\n  control_score = EXCLUDED.control_score,\n  updated_at = CURRENT_TIMESTAMP\nRETURNING id`;\n\nconst updateDealSQL = `UPDATE deals SET\n  salesforce_opportunity_id = ${esc(salesforce_opportunity_id)},\n  outputs_version = 'v2',\n  opportunity_name = ${escStr(opportunity_name)},\n  account_name = ${escStr(account_name)},\n  stage = ${escStr(stage)},\n  cas_current = ${escStr(cas_current)},\n  cas_next = ${escStr(cas_next)},\n  cas_confidence = ${escStr(cas_confidence)},\n  close_date = ${close_date ? escStr(close_date) : 'NULL'},\n  updated_at = CURRENT_TIMESTAMP\nWHERE deal_slug = ${esc(deal_slug)}\nRETURNING *`;\n\nconst saveArtifactsSQL = `INSERT INTO artifacts (\n  deal_id,\n  salesforce_block_1_dap,\n  salesforce_pain_description,\n  salesforce_power_description,\n  salesforce_vision_description,\n  salesforce_value_description,\n  salesforce_change_description,\n  salesforce_control_description,\n  client_follow_up_email,\n  exec_recap_forwardable,\n  internal_message_pricing,\n  meeting_prep,\n  assumptions,\n  exclusions,\n  approved\n) VALUES (\n  (SELECT id FROM deals WHERE deal_slug = ${esc(deal_slug)}),\n  ${esc(salesforce_block_1_dap)},\n  ${esc(pain_evidence)},\n  ${esc(power_evidence)},\n  ${esc(vision_evidence)},\n  ${esc(value_evidence)},\n  ${esc(change_evidence)},\n  ${esc(control_evidence)},\n  ${esc(client_follow_up_email)},\n  ${esc(exec_recap_forwardable)},\n  ${esc(internal_message_pricing)},\n  ${esc(meeting_prep)},\n  ${esc(assumptions)},\n  ${esc(exclusions)},\n  false\n)\nRETURNING id`;\n\nconst saveEvidenceSQL = `INSERT INTO p2v2c2_evidence (\n  deal_id, pain_score, pain_evidence, power_score, power_evidence,\n  vision_score, vision_evidence, value_score, value_evidence,\n  change_score, change_evidence, control_score, control_evidence,\n  p2v2c2_total\n) VALUES (\n  (SELECT id FROM deals WHERE deal_slug = ${esc(deal_slug)}),\n  ${escNum(pain_score)}, ${esc(pain_evidence)},\n  ${escNum(power_score)}, ${esc(power_evidence)},\n  ${escNum(vision_score)}, ${esc(vision_evidence)},\n  ${escNum(value_score)}, ${esc(value_evidence)},\n  ${escNum(change_score)}, ${esc(change_evidence)},\n  ${escNum(control_score)}, ${esc(control_evidence)},\n  ${escNum(p2v2c2_total)}\n)\nRETURNING id`;\n\nconst saveHistorySQL = `INSERT INTO deal_history (\n  deal_id,\n  event_type,\n  event_source,\n  event_date,\n  summary,\n  link_or_ref,\n  raw_content,\n  cas_at_time,\n  p2v2c2_total_at_time\n) VALUES (\n  (SELECT id FROM deals WHERE deal_slug = ${esc(deal_slug)}),\n  ${escStr(event_type)},\n  ${esc(event_source)},\n  ${escStr(event_date)}::date,\n  ${escStr(summary)},\n  ${esc(link_or_ref)},\n  ${escStr(raw_content)},\n  ${escStr(cas_current)},\n  ${escNum(p2v2c2_total)}\n)\nRETURNING id`;\n\nconsole.log('Format for PostgreSQL - _contextSource:', dealContext?._contextSource);\n\n// Build deal record (for compatibility with downstream nodes that read $json.deal.*)\nconst deal = {\n  deal_slug,\n  salesforce_opportunity_id,\n  outputs_version: 'v2',\n  opportunity_name,\n  account_name,\n  stage,\n  cas_current,\n  cas_next,\n  cas_confidence,\n  close_date,\n  pain_score, power_score, vision_score, value_score, change_score, control_score\n};\n\n// Build action plans\nconst actionPlans = (artifactsData.plan?.action_plan || []).map(action => ({\n  action_date: action.date,\n  owner: action.owner,\n  action_description: action.action,\n  status: action.status || 'pending'\n}));\n\nreturn [{\n  json: {\n    deal,\n    _contextSource: dealContext?._contextSource || 'unknown',\n    actionPlans,\n    insertDealSQL,\n    updateDealSQL,\n    saveArtifactsSQL,\n    saveEvidenceSQL,\n    saveHistorySQL,\n    // Expose artifact text for email node\n    pain_score, power_score, vision_score, value_score, change_score, control_score, p2v2c2_total,\n    pain_evidence, power_evidence, vision_evidence, value_evidence, change_evidence, control_evidence,\n    salesforce_block_1_dap, client_follow_up_email, exec_recap_forwardable, internal_message_pricing\n  }\n}];"
+        "jsCode": "// Format outputs from ECHO Engine for PostgreSQL and review portal\nconst engine = $('ECHO Engine').item.json;\nconst input = $('Input Classifier').item.json;\nconst dealContext = $('Merge Deal Context').item.json;\n\nif (!engine || !input) {\n  throw new Error('Missing required data from previous nodes');\n}\n\nfunction esc(val) {\n  if (val === null || val === undefined || val === '') return 'NULL';\n  return \"'\" + String(val).replace(/'/g, \"''\") + \"'\";\n}\nfunction escStr(val) {\n  if (val === null || val === undefined) return 'NULL';\n  return \"'\" + String(val).replace(/'/g, \"''\") + \"'\";\n}\nfunction escNum(val) {\n  const n = Number(val);\n  return isNaN(n) ? '0' : String(n);\n}\n\nfunction unwrap(node) {\n  const raw = node.output !== undefined ? node.output : node;\n  if (typeof raw === 'string') {\n    try {\n      const cleaned = raw.replace(/^```json\\s*/i, '').replace(/^```\\s*/i, '').replace(/```\\s*$/i, '').trim();\n      return JSON.parse(cleaned);\n    } catch(e) { return {}; }\n  }\n  return raw;\n}\n\nconst data = unwrap(engine);\nconst sf = data.salesforce || {};\nconst narr = data.narratives || {};\n\nfunction extractStageCode(casStr) {\n  if (!casStr) return '1A';\n  const match = casStr.match(/^([1-5][AB])/i);\n  if (match) return match[1].toUpperCase();\n  const s = casStr.toLowerCase();\n  if (s.includes('close') || s.includes('won') || s.includes('lost')) return '5A';\n  if (s.includes('negot') || s.includes('contract') || s.includes('msa') || s.includes('sow')) return '4A';\n  if (s.includes('prov') || s.includes('valid') || s.includes('proposal') || s.includes('demo')) return '3A';\n  if (s.includes('qualif') || s.includes('engaged') || s.includes('discover')) return '2A';\n  return '1A';\n}\n\nconst deal_slug = input.deal_slug || '';\nconst salesforce_opportunity_id = dealContext?.salesforce_opportunity_id || input.salesforce_opportunity_id || null;\nconst opportunity_name = input.opportunity_name || dealContext?.opportunity_name || '';\nconst account_name = input.account_name || dealContext?.account_name || '';\n\nconst close_date = sf.close_date || null;\nconst stage = sf.stage || '';\nconst cas = sf.cas || '';\nconst forecast_category = sf.forecast_category || '';\nconst salesforce_block_1_dap = sf.salesforce_block_1_dap || '';\nconst risks = sf.risks || '';\nconst next_step = sf.next_step || '';\n\nconst pain_score = Number(sf.pain_score) || 0;\nconst pain_evidence = sf.pain_evidence || '';\nconst power_score = Number(sf.power_score) || 0;\nconst power_evidence = sf.power_evidence || '';\nconst vision_score = Number(sf.vision_score) || 0;\nconst vision_evidence = sf.vision_evidence || '';\nconst value_score = Number(sf.value_score) || 0;\nconst value_evidence = sf.value_evidence || '';\nconst change_score = Number(sf.change_score) || 0;\nconst change_evidence = sf.change_evidence || '';\nconst control_score = Number(sf.control_score) || 0;\nconst control_evidence = sf.control_evidence || '';\nconst p2v2c2_total = pain_score + power_score + vision_score + value_score + change_score + control_score;\n\nconst call_summary = narr.call_summary || '';\nconst highlights = narr.highlights || '';\nconst action_items = narr.action_items || '';\nconst p2v2c2_scoring = narr.p2v2c2_scoring || '';\nconst internal_actions = narr.internal_actions || '';\nconst services_narrative = narr.services_narrative || '';\nconst general_narrative = narr.general_narrative || '';\nconst anecdotes = narr.anecdotes || '';\nconst internal_team_update = narr.internal_team_update || '';\n\nconst stage_code = extractStageCode(cas);\nconst cas_confidence = 'medium';\nconst event_type = input.input_type || '';\nconst event_date = input.date || new Date().toISOString().split('T')[0];\nconst summary_str = `Processed ${input.input_type} - CAS: ${cas || 'N/A'}`;\nconst link_or_ref = input.source_filename || '';\nconst raw_content = (input.content || '').substring(0, 5000);\n\nconst insertDealSQL = `INSERT INTO deals (\n  deal_slug, salesforce_opportunity_id, outputs_version,\n  opportunity_name, account_name, stage, cas_current, cas_next, cas_confidence,\n  pain_score, power_score, vision_score, value_score, change_score, control_score\n) VALUES (\n  ${esc(deal_slug)}, ${esc(salesforce_opportunity_id)}, 'v4',\n  ${escStr(opportunity_name)}, ${escStr(account_name)}, ${escStr(stage_code)},\n  ${escStr(cas)}, ${escStr('')}, ${escStr(cas_confidence)},\n  ${escNum(pain_score)}, ${escNum(power_score)}, ${escNum(vision_score)},\n  ${escNum(value_score)}, ${escNum(change_score)}, ${escNum(control_score)}\n)\nON CONFLICT (deal_slug) DO UPDATE SET\n  salesforce_opportunity_id = EXCLUDED.salesforce_opportunity_id,\n  outputs_version = EXCLUDED.outputs_version,\n  opportunity_name = EXCLUDED.opportunity_name,\n  account_name = EXCLUDED.account_name,\n  stage = EXCLUDED.stage,\n  cas_current = EXCLUDED.cas_current,\n  cas_confidence = EXCLUDED.cas_confidence,\n  pain_score = EXCLUDED.pain_score,\n  power_score = EXCLUDED.power_score,\n  vision_score = EXCLUDED.vision_score,\n  value_score = EXCLUDED.value_score,\n  change_score = EXCLUDED.change_score,\n  control_score = EXCLUDED.control_score,\n  updated_at = CURRENT_TIMESTAMP\nRETURNING id`;\n\nconst updateDealSQL = `UPDATE deals SET\n  salesforce_opportunity_id = ${esc(salesforce_opportunity_id)},\n  outputs_version = 'v4',\n  opportunity_name = ${escStr(opportunity_name)},\n  account_name = ${escStr(account_name)},\n  stage = ${escStr(stage_code)},\n  cas_current = ${escStr(cas)},\n  cas_confidence = ${escStr(cas_confidence)},\n  close_date = ${close_date ? escStr(close_date) : 'NULL'},\n  updated_at = CURRENT_TIMESTAMP\nWHERE deal_slug = ${esc(deal_slug)}\nRETURNING *`;\n\nconst saveArtifactsSQL = `INSERT INTO artifacts (\n  deal_id,\n  salesforce_block_1_dap,\n  salesforce_pain_description, salesforce_power_description,\n  salesforce_vision_description, salesforce_value_description,\n  salesforce_change_description, salesforce_control_description,\n  approved\n) VALUES (\n  (SELECT id FROM deals WHERE deal_slug = ${esc(deal_slug)}),\n  ${esc(salesforce_block_1_dap)},\n  ${esc(pain_evidence)}, ${esc(power_evidence)},\n  ${esc(vision_evidence)}, ${esc(value_evidence)},\n  ${esc(change_evidence)}, ${esc(control_evidence)},\n  false\n)\nRETURNING id`;\n\nconst saveEvidenceSQL = `INSERT INTO p2v2c2_evidence (\n  deal_id, pain_score, pain_evidence, power_score, power_evidence,\n  vision_score, vision_evidence, value_score, value_evidence,\n  change_score, change_evidence, control_score, control_evidence, p2v2c2_total\n) VALUES (\n  (SELECT id FROM deals WHERE deal_slug = ${esc(deal_slug)}),\n  ${escNum(pain_score)}, ${esc(pain_evidence)},\n  ${escNum(power_score)}, ${esc(power_evidence)},\n  ${escNum(vision_score)}, ${esc(vision_evidence)},\n  ${escNum(value_score)}, ${esc(value_evidence)},\n  ${escNum(change_score)}, ${esc(change_evidence)},\n  ${escNum(control_score)}, ${esc(control_evidence)},\n  ${escNum(p2v2c2_total)}\n)\nRETURNING id`;\n\nconst saveHistorySQL = `INSERT INTO deal_history (\n  deal_id, event_type, event_source, event_date, summary,\n  link_or_ref, raw_content, cas_at_time, p2v2c2_total_at_time\n) VALUES (\n  (SELECT id FROM deals WHERE deal_slug = ${esc(deal_slug)}),\n  ${escStr(event_type)}, ${esc('')}, ${escStr(event_date)}::date,\n  ${escStr(summary_str)}, ${esc(link_or_ref)}, ${escStr(raw_content)},\n  ${escStr(cas)}, ${escNum(p2v2c2_total)}\n)\nRETURNING id`;\n\nconst deal = {\n  deal_slug, salesforce_opportunity_id, outputs_version: 'v4',\n  opportunity_name, account_name, stage: stage_code,\n  cas_current: cas, cas_next: '', cas_confidence, close_date,\n  pain_score, power_score, vision_score, value_score, change_score, control_score\n};\n\nreturn [{\n  json: {\n    deal,\n    _contextSource: dealContext?._contextSource || 'unknown',\n    insertDealSQL, updateDealSQL, saveArtifactsSQL, saveEvidenceSQL, saveHistorySQL,\n    close_date, stage, cas, forecast_category,\n    salesforce_block_1_dap, risks, next_step,\n    pain_score, pain_evidence,\n    power_score, power_evidence,\n    vision_score, vision_evidence,\n    value_score, value_evidence,\n    change_score, change_evidence,\n    control_score, control_evidence,\n    p2v2c2_total,\n    call_summary, highlights, action_items, p2v2c2_scoring,\n    internal_actions, services_narrative, general_narrative,\n    anecdotes, internal_team_update\n  }\n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -231,10 +159,28 @@
         "formFields": {
           "values": [
             {
-              "fieldLabel": "client_follow_up_email",
-              "fieldType": "textarea",
+              "fieldLabel": "close_date",
+              "fieldType": "text",
               "requiredField": false,
-              "defaultValue": "={{ $('Format for PostgreSQL').item.json.client_follow_up_email }}"
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.close_date }}"
+            },
+            {
+              "fieldLabel": "stage",
+              "fieldType": "text",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.stage }}"
+            },
+            {
+              "fieldLabel": "cas",
+              "fieldType": "text",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.cas }}"
+            },
+            {
+              "fieldLabel": "forecast_category",
+              "fieldType": "text",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.forecast_category }}"
             },
             {
               "fieldLabel": "salesforce_block_1_dap",
@@ -243,10 +189,34 @@
               "defaultValue": "={{ $('Format for PostgreSQL').item.json.salesforce_block_1_dap }}"
             },
             {
+              "fieldLabel": "risks",
+              "fieldType": "textarea",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.risks }}"
+            },
+            {
+              "fieldLabel": "next_step",
+              "fieldType": "text",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.next_step }}"
+            },
+            {
+              "fieldLabel": "pain_score",
+              "fieldType": "number",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.pain_score }}"
+            },
+            {
               "fieldLabel": "pain_evidence",
               "fieldType": "textarea",
               "requiredField": false,
               "defaultValue": "={{ $('Format for PostgreSQL').item.json.pain_evidence }}"
+            },
+            {
+              "fieldLabel": "power_score",
+              "fieldType": "number",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.power_score }}"
             },
             {
               "fieldLabel": "power_evidence",
@@ -255,10 +225,22 @@
               "defaultValue": "={{ $('Format for PostgreSQL').item.json.power_evidence }}"
             },
             {
+              "fieldLabel": "vision_score",
+              "fieldType": "number",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.vision_score }}"
+            },
+            {
               "fieldLabel": "vision_evidence",
               "fieldType": "textarea",
               "requiredField": false,
               "defaultValue": "={{ $('Format for PostgreSQL').item.json.vision_evidence }}"
+            },
+            {
+              "fieldLabel": "value_score",
+              "fieldType": "number",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.value_score }}"
             },
             {
               "fieldLabel": "value_evidence",
@@ -267,10 +249,22 @@
               "defaultValue": "={{ $('Format for PostgreSQL').item.json.value_evidence }}"
             },
             {
+              "fieldLabel": "change_score",
+              "fieldType": "number",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.change_score }}"
+            },
+            {
               "fieldLabel": "change_evidence",
               "fieldType": "textarea",
               "requiredField": false,
               "defaultValue": "={{ $('Format for PostgreSQL').item.json.change_evidence }}"
+            },
+            {
+              "fieldLabel": "control_score",
+              "fieldType": "number",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.control_score }}"
             },
             {
               "fieldLabel": "control_evidence",
@@ -279,16 +273,58 @@
               "defaultValue": "={{ $('Format for PostgreSQL').item.json.control_evidence }}"
             },
             {
-              "fieldLabel": "exec_recap_forwardable",
+              "fieldLabel": "call_summary",
               "fieldType": "textarea",
               "requiredField": false,
-              "defaultValue": "={{ $('Format for PostgreSQL').item.json.exec_recap_forwardable }}"
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.call_summary }}"
             },
             {
-              "fieldLabel": "internal_message_pricing",
+              "fieldLabel": "highlights",
               "fieldType": "textarea",
               "requiredField": false,
-              "defaultValue": "={{ $('Format for PostgreSQL').item.json.internal_message_pricing }}"
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.highlights }}"
+            },
+            {
+              "fieldLabel": "action_items",
+              "fieldType": "textarea",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.action_items }}"
+            },
+            {
+              "fieldLabel": "p2v2c2_scoring",
+              "fieldType": "textarea",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.p2v2c2_scoring }}"
+            },
+            {
+              "fieldLabel": "internal_actions",
+              "fieldType": "textarea",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.internal_actions }}"
+            },
+            {
+              "fieldLabel": "services_narrative",
+              "fieldType": "textarea",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.services_narrative }}"
+            },
+            {
+              "fieldLabel": "general_narrative",
+              "fieldType": "textarea",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.general_narrative }}"
+            },
+            {
+              "fieldLabel": "anecdotes",
+              "fieldType": "textarea",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.anecdotes }}"
+            },
+            {
+              "fieldLabel": "internal_team_update",
+              "fieldType": "textarea",
+              "requiredField": false,
+              "defaultValue": "={{ $('Format for PostgreSQL').item.json.internal_team_update }}"
             }
           ]
         },
@@ -308,7 +344,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Merge original AI outputs with Austin's edits from the form\nconst orig = $('Format for PostgreSQL').item.json;\nconst form = $input.item.json;\n\nfunction esc(val) {\n  if (val === null || val === undefined || val === '') return 'NULL';\n  return \"'\" + String(val).replace(/'/g, \"''\") + \"'\";\n}\nfunction escStr(val) {\n  if (val === null || val === undefined) return 'NULL';\n  return \"'\" + String(val).replace(/'/g, \"''\") + \"'\";\n}\nfunction escNum(val) {\n  const n = Number(val);\n  return isNaN(n) ? '0' : String(n);\n}\n\n// Use edited value if it differs from original, otherwise keep original\nfunction edited(formVal, origVal) {\n  const f = (formVal || '').trim();\n  const o = (origVal || '').trim();\n  return f.length > 0 ? f : o;\n}\n\nconst client_follow_up_email = edited(form['client_follow_up_email'], orig.client_follow_up_email);\nconst salesforce_block_1_dap = edited(form['salesforce_block_1_dap'], orig.salesforce_block_1_dap);\nconst pain_evidence = edited(form['pain_evidence'], orig.pain_evidence);\nconst power_evidence = edited(form['power_evidence'], orig.power_evidence);\nconst vision_evidence = edited(form['vision_evidence'], orig.vision_evidence);\nconst value_evidence = edited(form['value_evidence'], orig.value_evidence);\nconst change_evidence = edited(form['change_evidence'], orig.change_evidence);\nconst control_evidence = edited(form['control_evidence'], orig.control_evidence);\nconst exec_recap_forwardable = edited(form['exec_recap_forwardable'], orig.exec_recap_forwardable);\nconst internal_message_pricing = edited(form['internal_message_pricing'], orig.internal_message_pricing);\n\nconst deal_slug = orig.deal.deal_slug;\n\n// Detect which fields were actually changed\nconst feedback_rows = [\n  { key: 'client_follow_up_email', original: orig.client_follow_up_email, edited: client_follow_up_email },\n  { key: 'salesforce_block_1_dap', original: orig.salesforce_block_1_dap, edited: salesforce_block_1_dap },\n  { key: 'pain_evidence', original: orig.pain_evidence, edited: pain_evidence },\n  { key: 'power_evidence', original: orig.power_evidence, edited: power_evidence },\n  { key: 'vision_evidence', original: orig.vision_evidence, edited: vision_evidence },\n  { key: 'value_evidence', original: orig.value_evidence, edited: value_evidence },\n  { key: 'change_evidence', original: orig.change_evidence, edited: change_evidence },\n  { key: 'control_evidence', original: orig.control_evidence, edited: control_evidence },\n  { key: 'exec_recap_forwardable', original: orig.exec_recap_forwardable, edited: exec_recap_forwardable },\n  { key: 'internal_message_pricing', original: orig.internal_message_pricing, edited: internal_message_pricing },\n];\n\n// Build multi-row INSERT for artifacts_feedback\nconst feedbackValues = feedback_rows.map(r => {\n  const was_edited = (r.original || '').trim() !== (r.edited || '').trim();\n  return `((SELECT id FROM deals WHERE deal_slug = ${esc(deal_slug)}), ${escStr(r.key)}, ${esc(r.original)}, ${esc(r.edited)}, ${was_edited})`;\n}).join(',\\n  ');\n\nconst saveFeedbackSQL = `INSERT INTO artifacts_feedback (deal_id, artifact_key, original_output, edited_output, was_used)\\nVALUES\\n  ${feedbackValues}`;\n\n// Rebuild saveArtifactsSQL with edited values\nconst saveArtifactsSQL = `INSERT INTO artifacts (\\n  deal_id,\\n  salesforce_block_1_dap,\\n  salesforce_pain_description,\\n  salesforce_power_description,\\n  salesforce_vision_description,\\n  salesforce_value_description,\\n  salesforce_change_description,\\n  salesforce_control_description,\\n  client_follow_up_email,\\n  exec_recap_forwardable,\\n  internal_message_pricing,\\n  meeting_prep,\\n  assumptions,\\n  exclusions,\\n  approved\\n) VALUES (\\n  (SELECT id FROM deals WHERE deal_slug = ${esc(deal_slug)}),\\n  ${esc(salesforce_block_1_dap)},\\n  ${esc(pain_evidence)},\\n  ${esc(power_evidence)},\\n  ${esc(vision_evidence)},\\n  ${esc(value_evidence)},\\n  ${esc(change_evidence)},\\n  ${esc(control_evidence)},\\n  ${esc(client_follow_up_email)},\\n  ${esc(exec_recap_forwardable)},\\n  ${esc(internal_message_pricing)},\\n  ${esc(orig.meeting_prep || '')},\\n  ${esc(orig.assumptions || '')},\\n  ${esc(orig.exclusions || '')},\\n  true\\n)\\nRETURNING id`;\n\nreturn [{\n  json: {\n    ...orig,\n    // Override with edited artifact text\n    client_follow_up_email,\n    salesforce_block_1_dap,\n    pain_evidence,\n    power_evidence,\n    vision_evidence,\n    value_evidence,\n    change_evidence,\n    control_evidence,\n    exec_recap_forwardable,\n    internal_message_pricing,\n    // Updated SQLs\n    saveArtifactsSQL,\n    saveFeedbackSQL\n  }\n}];"
+        "jsCode": "// Merge original AI outputs with edits from the review form\nconst orig = $('Format for PostgreSQL').item.json;\nconst form = $input.item.json;\n\nfunction esc(val) {\n  if (val === null || val === undefined || val === '') return 'NULL';\n  return \"'\" + String(val).replace(/'/g, \"''\") + \"'\";\n}\nfunction escStr(val) {\n  if (val === null || val === undefined) return 'NULL';\n  return \"'\" + String(val).replace(/'/g, \"''\") + \"'\";\n}\nfunction escNum(val) {\n  const n = Number(val);\n  return isNaN(n) ? '0' : String(n);\n}\n\nfunction edited(formVal, origVal) {\n  const f = (formVal || '').trim();\n  return f.length > 0 ? f : (origVal || '');\n}\nfunction editedNum(formVal, origVal) {\n  const f = String(formVal || '').trim();\n  const n = Number(f);\n  return (!isNaN(n) && f.length > 0) ? n : origVal;\n}\n\n// Salesforce standalone\nconst close_date = edited(form['close_date'], orig.close_date);\nconst stage = edited(form['stage'], orig.stage);\nconst cas = edited(form['cas'], orig.cas);\nconst forecast_category = edited(form['forecast_category'], orig.forecast_category);\nconst salesforce_block_1_dap = edited(form['salesforce_block_1_dap'], orig.salesforce_block_1_dap);\nconst risks = edited(form['risks'], orig.risks);\nconst next_step = edited(form['next_step'], orig.next_step);\n\n// P2V2C2\nconst pain_score = editedNum(form['pain_score'], orig.pain_score);\nconst pain_evidence = edited(form['pain_evidence'], orig.pain_evidence);\nconst power_score = editedNum(form['power_score'], orig.power_score);\nconst power_evidence = edited(form['power_evidence'], orig.power_evidence);\nconst vision_score = editedNum(form['vision_score'], orig.vision_score);\nconst vision_evidence = edited(form['vision_evidence'], orig.vision_evidence);\nconst value_score = editedNum(form['value_score'], orig.value_score);\nconst value_evidence = edited(form['value_evidence'], orig.value_evidence);\nconst change_score = editedNum(form['change_score'], orig.change_score);\nconst change_evidence = edited(form['change_evidence'], orig.change_evidence);\nconst control_score = editedNum(form['control_score'], orig.control_score);\nconst control_evidence = edited(form['control_evidence'], orig.control_evidence);\nconst p2v2c2_total = pain_score + power_score + vision_score + value_score + change_score + control_score;\n\n// Narratives\nconst call_summary = edited(form['call_summary'], orig.call_summary);\nconst highlights = edited(form['highlights'], orig.highlights);\nconst action_items = edited(form['action_items'], orig.action_items);\nconst p2v2c2_scoring = edited(form['p2v2c2_scoring'], orig.p2v2c2_scoring);\nconst internal_actions = edited(form['internal_actions'], orig.internal_actions);\nconst services_narrative = edited(form['services_narrative'], orig.services_narrative);\nconst general_narrative = edited(form['general_narrative'], orig.general_narrative);\nconst anecdotes = edited(form['anecdotes'], orig.anecdotes);\nconst internal_team_update = edited(form['internal_team_update'], orig.internal_team_update);\n\nconst deal_slug = orig.deal.deal_slug;\n\nreturn [{\n  json: {\n    deal: orig.deal,\n    close_date, stage, cas, forecast_category,\n    salesforce_block_1_dap, risks, next_step,\n    pain_score, pain_evidence,\n    power_score, power_evidence,\n    vision_score, vision_evidence,\n    value_score, value_evidence,\n    change_score, change_evidence,\n    control_score, control_evidence,\n    p2v2c2_total,\n    call_summary, highlights, action_items, p2v2c2_scoring,\n    internal_actions, services_narrative, general_narrative,\n    anecdotes, internal_team_update\n  }\n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -572,6 +608,75 @@
         80
       ],
       "name": "Merge Deal Context"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        288
+      ],
+      "name": "GPT-4o",
+      "credentials": {
+        "openAiApi": {
+          "id": "fIeGh1UabUL1CBma",
+          "name": "ECHO OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {
+          "baseURL": "https://api.openai.com/v1"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        240,
+        560
+      ],
+      "name": "OpenAI Embeddings",
+      "credentials": {
+        "openAiApi": {
+          "id": "fIeGh1UabUL1CBma",
+          "name": "ECHO OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "clearwater_knowledge_base",
+        "toolDescription": "Search Clearwater's CPS methodology (P2V2C2 scoring rubric 0-5 definitions, DAP structure, sales stages Discover/Qualify/Prove/Negotiate/Close, Champion/PES/ES/DM role definitions) and Clearwater's full service catalog (MSS, MDR, Risk Analysis, IRM|Pro, ClearAdvantage, vCISO, Privacy & Compliance, Technical Testing, etc.). Use this tool to look up scoring criteria, service terminology, and sales process definitions.",
+        "tableName": "n8n_vectors",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        480
+      ],
+      "name": "ECHO Knowledge Base (PGVector)",
+      "credentials": {
+        "postgres": {
+          "id": "ZMNqF3gUEXvNCjht",
+          "name": "ECHO PostgreSQL"
+        }
+      }
     }
   ],
   "connections": {
@@ -630,40 +735,7 @@
         ]
       ]
     },
-    "Assessment Engine (Agent 1)": {
-      "main": [
-        [
-          {
-            "node": "Artifact Engine (Agent 2)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Gemini 2.0 Flash (Assessment)": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Assessment Engine (Agent 1)",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Structured Output Parser (Assessment)": {
-      "ai_outputParser": [
-        [
-          {
-            "node": "Assessment Engine (Agent 1)",
-            "type": "ai_outputParser",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Artifact Engine (Agent 2)": {
+    "ECHO Engine": {
       "main": [
         [
           {
@@ -674,22 +746,11 @@
         ]
       ]
     },
-    "Gemini 2.0 Flash (Artifact)": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Artifact Engine (Agent 2)",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Structured Output Parser (Artifact)": {
+    "Structured Output Parser": {
       "ai_outputParser": [
         [
           {
-            "node": "Artifact Engine (Agent 2)",
+            "node": "ECHO Engine",
             "type": "ai_outputParser",
             "index": 0
           }
@@ -841,22 +902,55 @@
         ]
       ]
     },
-    "Merge Deal Context": {
+    "Open Review Portal": {
       "main": [
         [
           {
-            "node": "Assessment Engine (Agent 1)",
+            "node": "Wait for Review (Editing Portal)",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Open Review Portal": {
+    "GPT-4o": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ECHO Engine",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "ECHO Knowledge Base (PGVector)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ECHO Knowledge Base (PGVector)": {
+      "ai_tool": [
+        [
+          {
+            "node": "ECHO Engine",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Deal Context": {
       "main": [
         [
           {
-            "node": "Wait for Review (Editing Portal)",
+            "node": "ECHO Engine",
             "type": "main",
             "index": 0
           }
