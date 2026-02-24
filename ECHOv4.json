@@ -539,7 +539,7 @@
               "operator": {
                 "type": "string",
                 "operation": "contains",
-                "singleValue": "existing"
+                "singleValue": "new"
               }
             }
           ],
@@ -958,14 +958,14 @@
       "main": [
         [
           {
-            "node": "Merge Deal Context",
+            "node": "Create New Opportunity",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Create New Opportunity",
+            "node": "Merge Deal Context",
             "type": "main",
             "index": 0
           }
