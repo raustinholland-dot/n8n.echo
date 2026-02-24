@@ -535,10 +535,11 @@
           "conditions": [
             {
               "id": "check-deal-found",
-              "leftValue": "={{ $('Load Deal Memory').item.json.id }}",
+              "leftValue": "={{ $json._contextSource?.toLowerCase().trim() }}",
               "operator": {
                 "type": "string",
-                "operation": "exists"
+                "operation": "contains",
+                "singleValue": "existing"
               }
             }
           ],
