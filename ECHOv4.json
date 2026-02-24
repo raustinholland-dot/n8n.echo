@@ -425,7 +425,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ $('Merge Edited Artifacts').item.json.saveFeedbackSQL }}",
+        "query": "SELECT 1",
         "options": {
           "queryBatching": "independently"
         }
