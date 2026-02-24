@@ -336,7 +336,7 @@
           "conditions": [
             {
               "id": "check-new-opp-id",
-              "leftValue": "={{ $json._contextSource?.toLowerCase().trim() }}",
+              "leftValue": "={{ $('Format for PostgreSQL').item.json._contextSource?.toLowerCase().trim() }}",
               "operator": {
                 "type": "string",
                 "operation": "contains",
@@ -359,7 +359,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ $json.insertDealSQL }}",
+        "query": "={{ $('Format for PostgreSQL').item.json.insertDealSQL }}",
         "options": {
           "queryBatching": "independently"
         }
@@ -381,7 +381,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ $json.updateDealSQL }}",
+        "query": "={{ $('Format for PostgreSQL').item.json.updateDealSQL }}",
         "options": {
           "queryBatching": "independently"
         }
@@ -403,7 +403,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ $('Merge Edited Artifacts').item.json.saveArtifactsSQL }}",
+        "query": "={{ $('Format for PostgreSQL').item.json.saveArtifactsSQL }}",
         "options": {
           "queryBatching": "independently"
         }
@@ -448,7 +448,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ $('Merge Edited Artifacts').item.json.saveEvidenceSQL }}",
+        "query": "={{ $('Format for PostgreSQL').item.json.saveEvidenceSQL }}",
         "options": {
           "queryBatching": "independently"
         }
@@ -470,7 +470,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ $('Merge Edited Artifacts').item.json.saveHistorySQL }}",
+        "query": "={{ $('Format for PostgreSQL').item.json.saveHistorySQL }}",
         "options": {
           "queryBatching": "independently"
         }
@@ -504,8 +504,8 @@
     {
       "parameters": {
         "sendTo": "austin.holland@clearwatersecurity.com",
-        "subject": "Deal Path Artifacts Notification",
-        "message": "=<h2>Deal Path Artifacts \u2014 Final (Reviewed)</h2>\n\n<p><strong>Deal:</strong> {{ $('Merge Edited Artifacts').item.json.deal.deal_slug }}</p>\n<p><strong>Opportunity:</strong> {{ $('Merge Edited Artifacts').item.json.deal.opportunity_name }}</p>\n<p><strong>Date:</strong> {{ $('Input Classifier').item.json.date }}</p>\n<p><strong>Input Type:</strong> {{ $('Input Classifier').item.json.input_type }}</p>\n\n<h3>CAS Stage</h3>\n<p><strong>Current:</strong> {{ $('Merge Edited Artifacts').item.json.deal.cas_current }}</p>\n<p><strong>Next:</strong> {{ $('Merge Edited Artifacts').item.json.deal.cas_next }}</p>\n\n<hr>\n\n<h3>Artifacts (Reviewed &amp; Approved)</h3>\n\n<h4>Client Follow-Up Email</h4>\n<pre style=\"background:#f5f5f5; padding:15px; border-radius:5px; white-space:pre-wrap;\">{{ $('Merge Edited Artifacts').item.json.client_follow_up_email }}</pre>\n\n<h4>Salesforce DAP Block</h4>\n<pre style=\"background:#f5f5f5; padding:15px; border-radius:5px; white-space:pre-wrap;\">{{ $('Merge Edited Artifacts').item.json.salesforce_block_1_dap }}</pre>\n\n<h4>Salesforce P2V2C2</h4>\n<pre style=\"background:#f5f5f5; padding:15px; border-radius:5px; white-space:pre-wrap;\">Pain ({{ $('Merge Edited Artifacts').item.json.pain_score }}/5): {{ $('Merge Edited Artifacts').item.json.pain_evidence }}\n\nPower ({{ $('Merge Edited Artifacts').item.json.power_score }}/5): {{ $('Merge Edited Artifacts').item.json.power_evidence }}\n\nVision ({{ $('Merge Edited Artifacts').item.json.vision_score }}/5): {{ $('Merge Edited Artifacts').item.json.vision_evidence }}\n\nValue ({{ $('Merge Edited Artifacts').item.json.value_score }}/5): {{ $('Merge Edited Artifacts').item.json.value_evidence }}\n\nChange ({{ $('Merge Edited Artifacts').item.json.change_score }}/5): {{ $('Merge Edited Artifacts').item.json.change_evidence }}\n\nControl ({{ $('Merge Edited Artifacts').item.json.control_score }}/5): {{ $('Merge Edited Artifacts').item.json.control_evidence }}\n\nTotal: {{ $('Merge Edited Artifacts').item.json.p2v2c2_total }}/30</pre>\n\n<h4>Executive Recap</h4>\n<pre style=\"background:#f5f5f5; padding:15px; border-radius:5px; white-space:pre-wrap;\">{{ $('Merge Edited Artifacts').item.json.exec_recap_forwardable }}</pre>\n\n<h4>Internal Message - Pricing</h4>\n<pre style=\"background:#f5f5f5; padding:15px; border-radius:5px; white-space:pre-wrap;\">{{ $('Merge Edited Artifacts').item.json.internal_message_pricing }}</pre>",
+        "subject": "=ECHO Artifacts \u2014 {{ $('Format for PostgreSQL').item.json.deal.deal_slug }}",
+        "message": "=<h2>ECHO Deal Artifacts \u2014 {{ $('Input Classifier').item.json.deal_slug || $('Format for PostgreSQL').item.json.deal.deal_slug }}</h2>\n\n<p><strong>Account:</strong> {{ $('Format for PostgreSQL').item.json.deal.account_name }}</p>\n<p><strong>Date:</strong> {{ $('Input Classifier').item.json.date }}</p>\n<p><strong>Input Type:</strong> {{ $('Input Classifier').item.json.input_type }}</p>\n\n<h3>Salesforce</h3>\n<p><strong>Stage:</strong> {{ $('Format for PostgreSQL').item.json.stage }} &nbsp;|&nbsp; <strong>CAS:</strong> {{ $('Format for PostgreSQL').item.json.cas }}</p>\n<p><strong>Close Date:</strong> {{ $('Format for PostgreSQL').item.json.close_date }}</p>\n<p><strong>Forecast:</strong> {{ $('Format for PostgreSQL').item.json.forecast_category }}</p>\n\n<h3>P2V2C2 Scores</h3>\n<pre style=\"background:#f5f5f5;padding:12px;border-radius:4px;\">Pain:    {{ $('Format for PostgreSQL').item.json.pain_score }}/5 \u2014 {{ $('Format for PostgreSQL').item.json.pain_evidence }}\nPower:   {{ $('Format for PostgreSQL').item.json.power_score }}/5 \u2014 {{ $('Format for PostgreSQL').item.json.power_evidence }}\nVision:  {{ $('Format for PostgreSQL').item.json.vision_score }}/5 \u2014 {{ $('Format for PostgreSQL').item.json.vision_evidence }}\nValue:   {{ $('Format for PostgreSQL').item.json.value_score }}/5 \u2014 {{ $('Format for PostgreSQL').item.json.value_evidence }}\nChange:  {{ $('Format for PostgreSQL').item.json.change_score }}/5 \u2014 {{ $('Format for PostgreSQL').item.json.change_evidence }}\nControl: {{ $('Format for PostgreSQL').item.json.control_score }}/5 \u2014 {{ $('Format for PostgreSQL').item.json.control_evidence }}\nTotal:   {{ $('Format for PostgreSQL').item.json.p2v2c2_total }}/30</pre>\n\n<h3>DAP Block</h3>\n<pre style=\"background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;\">{{ $('Format for PostgreSQL').item.json.salesforce_block_1_dap }}</pre>\n\n<h3>Risks</h3>\n<p>{{ $('Format for PostgreSQL').item.json.risks }}</p>\n\n<h3>Next Step</h3>\n<p>{{ $('Format for PostgreSQL').item.json.next_step }}</p>\n\n<hr>\n\n<h3>Call Summary</h3>\n<pre style=\"background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;\">{{ $('Format for PostgreSQL').item.json.call_summary }}</pre>\n\n<h3>Highlights</h3>\n<pre style=\"background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;\">{{ $('Format for PostgreSQL').item.json.highlights }}</pre>\n\n<h3>Action Items</h3>\n<pre style=\"background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;\">{{ $('Format for PostgreSQL').item.json.action_items }}</pre>\n\n<h3>Internal Actions</h3>\n<pre style=\"background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;\">{{ $('Format for PostgreSQL').item.json.internal_actions }}</pre>\n\n<h3>Services Narrative</h3>\n<pre style=\"background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;\">{{ $('Format for PostgreSQL').item.json.services_narrative }}</pre>\n\n<h3>General Narrative</h3>\n<pre style=\"background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;\">{{ $('Format for PostgreSQL').item.json.general_narrative }}</pre>\n\n<h3>Internal Team Update</h3>\n<pre style=\"background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;\">{{ $('Format for PostgreSQL').item.json.internal_team_update }}</pre>\n\n<h3>Anecdotes</h3>\n<pre style=\"background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;\">{{ $('Format for PostgreSQL').item.json.anecdotes }}</pre>",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
@@ -842,7 +842,7 @@
       "main": [
         [
           {
-            "node": "Open Review Portal",
+            "node": "Check if New Deal",
             "type": "main",
             "index": 0
           }
